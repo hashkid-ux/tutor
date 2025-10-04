@@ -1,188 +1,177 @@
-import { useState } from "react";
-import SubjectCard from "@/components/SubjectCard";
-import QuestCard from "@/components/QuestCard";
-import AchievementBadge from "@/components/AchievementBadge";
-import ChatInterface from "@/components/ChatInterface";
-import MultimodalInput from "@/components/MultimodalInput";
-import DerivationCanvas from "@/components/DerivationCanvas";
-import QuizCard from "@/components/QuizCard";
-import VisualizationCanvas from "@/components/VisualizationCanvas";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Atom, Beaker, Calculator, Leaf, Binary, Award, Sparkles, BookOpen } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { AlertCircle, BookOpen, Award, Target, TrendingUp, Sparkles, Crown, User } from "lucide-react";
 
 export default function Home() {
-  //todo: remove mock functionality
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      role: "assistant" as const,
-      content: "Hello! I'm your AI tutor. What would you like to learn today? I can help with any subject from Physics to Computer Science!",
-      timestamp: new Date(Date.now() - 300000),
-    },
-    {
-      id: "2",
-      role: "user" as const,
-      content: "Can you explain Newton's laws of motion with visualizations?",
-      timestamp: new Date(Date.now() - 240000),
-    },
-    {
-      id: "3",
-      role: "assistant" as const,
-      content: "Great question! Let me break down Newton's three laws with interactive 3D visualizations. I'll also create a quiz to test your understanding!",
-      timestamp: new Date(Date.now() - 180000),
-      type: "visualization" as const,
-    },
-  ]);
+  const { user } = useAuth();
 
-  const subjects = [
-    { name: "Physics", icon: Atom, color: "hsl(220, 90%, 60%)", progress: 68, topics: 24, completedTopics: 16 },
-    { name: "Chemistry", icon: Beaker, color: "hsl(165, 75%, 50%)", progress: 45, topics: 20, completedTopics: 9 },
-    { name: "Mathematics", icon: Calculator, color: "hsl(265, 85%, 65%)", progress: 82, topics: 30, completedTopics: 25 },
-    { name: "Biology", icon: Leaf, color: "hsl(145, 70%, 55%)", progress: 55, topics: 18, completedTopics: 10 },
-    { name: "Computer Science", icon: Binary, color: "hsl(195, 100%, 50%)", progress: 72, topics: 22, completedTopics: 16 },
+  if (!user) return null;
+
+  const features = [
+    {
+      title: "Doubts & Derivations",
+      description: "Ask questions and get step-by-step derivations - completely free!",
+      icon: AlertCircle,
+      link: "/doubts",
+      badge: "Free",
+      color: "hsl(220, 90%, 60%)",
+    },
+    {
+      title: "Story Mode",
+      description: "Learn through immersive story-based lessons with scenes and challenges",
+      icon: BookOpen,
+      link: "/story",
+      badge: "Premium",
+      color: "hsl(165, 75%, 50%)",
+    },
+    {
+      title: "Syllabus Explorer",
+      description: "Comprehensive Class 11 & 12 syllabus for Physics, Chemistry, and Math",
+      icon: BookOpen,
+      link: "/syllabus",
+      badge: "Premium",
+      color: "hsl(265, 85%, 65%)",
+    },
+    {
+      title: "Quests & Achievements",
+      description: "Complete quests, earn XP, unlock achievements, and level up!",
+      icon: Target,
+      link: "/quests",
+      badge: "Gamified",
+      color: "hsl(145, 70%, 55%)",
+    },
+    {
+      title: "Progress Tracking",
+      description: "Track your learning journey with detailed analytics",
+      icon: TrendingUp,
+      link: "/progress",
+      badge: "Analytics",
+      color: "hsl(195, 100%, 50%)",
+    },
+    {
+      title: "Character Customization",
+      description: "Customize your avatar and showcase your achievements",
+      icon: User,
+      link: "/character",
+      badge: "Personalize",
+      color: "hsl(280, 85%, 65%)",
+    },
   ];
 
-  const derivationSteps = [
-    { expression: "d/dx(x²)", explanation: "We start with the power rule for differentiation." },
-    { expression: "= 2x^(2-1)", explanation: "Apply the power rule: bring down the exponent and subtract 1 from it." },
-    { expression: "= 2x¹", explanation: "Simplify the exponent: 2-1 = 1" },
-    { expression: "= 2x", explanation: "Final result: the derivative of x² is 2x" },
+  const subscriptionTiers = [
+    {
+      name: "Free",
+      price: "₹0",
+      features: ["Unlimited Doubts", "Unlimited Derivations", "Basic Progress Tracking"],
+    },
+    {
+      name: "Basic",
+      price: "₹199/month",
+      features: ["GPT-4 mini", "10,000 tokens/day", "All Free features", "Story Mode access"],
+    },
+    {
+      name: "Pro",
+      price: "₹899/month",
+      features: ["GPT-4o", "50,000 tokens/day", "All Basic features", "3D Visualizations"],
+    },
+    {
+      name: "Unlimited",
+      price: "₹2999/month",
+      features: ["GPT-4o", "Unlimited tokens", "All Pro features", "Priority Support"],
+    },
   ];
-
-  const handleSendMessage = (message: string) => {
-    const newMessage = {
-      id: Date.now().toString(),
-      role: "user" as const,
-      content: message,
-      timestamp: new Date(),
-    };
-    setMessages([...messages, newMessage]);
-    
-    setTimeout(() => {
-      const aiResponse = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant" as const,
-        content: "I understand your question. Let me create an interactive explanation with visualizations and practice problems!",
-        timestamp: new Date(),
-        type: "visualization" as const,
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
-  };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="font-display text-4xl font-bold">Welcome back!</h1>
-        <p className="text-muted-foreground">Continue your learning journey</p>
+    <div className="space-y-8 p-6">
+      <div className="text-center space-y-2">
+        <h1 className="font-display text-5xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
+          Welcome back, {user.username}!
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Class {user.selectedClass} • Level {user.level} • {user.xp} XP
+        </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <section>
-            <h2 className="mb-4 font-display text-2xl font-semibold">Your Subjects</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {subjects.map((subject) => (
-                <SubjectCard key={subject.name} {...subject} />
-              ))}
-            </div>
-          </section>
+      <Card className="border-primary">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-primary" />
+            Your Subscription: {user.subscriptionTier}
+          </CardTitle>
+          <CardDescription>
+            {user.subscriptionTier === "free"
+              ? "Upgrade to unlock Story Mode, 3D visualizations, and more!"
+              : "You have access to premium features!"}
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-          <section>
-            <h2 className="mb-4 font-display text-2xl font-semibold">Active Quest</h2>
-            <QuestCard
-              title="Master of Derivatives"
-              description="Complete all calculus challenges in Mathematics"
-              progress={2}
-              maxProgress={3}
-              xpReward={250}
-              status="active"
-              objectives={[
-                "Complete chain rule tutorial",
-                "Solve 5 derivative problems",
-                "Pass the derivatives quiz",
-              ]}
-            />
-          </section>
-
-          <section>
-            <h2 className="mb-4 font-display text-2xl font-semibold">Learning Tools</h2>
-            <Tabs defaultValue="chat" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="chat">AI Chat</TabsTrigger>
-                <TabsTrigger value="derivation">Derivation</TabsTrigger>
-                <TabsTrigger value="visualization">3D View</TabsTrigger>
-                <TabsTrigger value="quiz">Quiz</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="chat" className="mt-4 space-y-4">
-                <div className="h-[400px] rounded-lg border bg-card p-4">
-                  <ChatInterface messages={messages} />
-                </div>
-                <MultimodalInput
-                  onSend={handleSendMessage}
-                  onVoiceToggle={() => console.log("Voice toggled")}
-                  onImageUpload={(file) => console.log("Image uploaded:", file.name)}
-                  onScreenShare={() => console.log("Screen share started")}
-                />
-              </TabsContent>
-
-              <TabsContent value="derivation" className="mt-4">
-                <DerivationCanvas title="Power Rule: Derivative of x²" steps={derivationSteps} />
-              </TabsContent>
-
-              <TabsContent value="visualization" className="mt-4">
-                <VisualizationCanvas
-                  title="Newton's First Law"
-                  description="Interactive 3D demonstration of inertia"
-                />
-              </TabsContent>
-
-              <TabsContent value="quiz" className="mt-4">
-                <QuizCard
-                  question="What is the derivative of sin(x)?"
-                  options={["cos(x)", "-cos(x)", "tan(x)", "-sin(x)"]}
-                  correctAnswer={0}
-                  difficulty="medium"
-                  timeLimit={45}
-                />
-              </TabsContent>
-            </Tabs>
-          </section>
+      <section>
+        <h2 className="mb-6 font-display text-3xl font-semibold">Explore Features</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <Link key={feature.title} href={feature.link}>
+              <Card className="h-full cursor-pointer transition-all hover:shadow-lg hover:scale-105" data-testid={`card-feature-${feature.title.toLowerCase().replace(/\s/g, "-")}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: feature.color }}>
+                      <feature.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                      {feature.badge}
+                    </span>
+                  </div>
+                  <CardTitle className="mt-4">{feature.title}</CardTitle>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          ))}
         </div>
+      </section>
 
-        <div className="space-y-6">
-          <section>
-            <h2 className="mb-4 font-display text-2xl font-semibold flex items-center gap-2">
-              <Award className="h-6 w-6 text-chart-5" />
-              Achievements
-            </h2>
-            <div className="space-y-3">
-              <AchievementBadge
-                title="Week Warrior"
-                description="Maintain a 7-day learning streak"
-                icon={Sparkles}
-                tier="gold"
-                unlocked={true}
-              />
-              <AchievementBadge
-                title="Quick Learner"
-                description="Complete 10 topics in one week"
-                icon={BookOpen}
-                tier="silver"
-                unlocked={true}
-              />
-              <AchievementBadge
-                title="Subject Master"
-                description="Achieve 100% mastery in any subject"
-                icon={Award}
-                tier="gold"
-                unlocked={false}
-              />
-            </div>
-          </section>
-        </div>
-      </div>
+      {user.subscriptionTier === "free" && (
+        <section>
+          <h2 className="mb-6 font-display text-3xl font-semibold">Upgrade Your Learning</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {subscriptionTiers.map((tier) => (
+              <Card key={tier.name} className={tier.name === "Pro" ? "border-primary" : ""}>
+                <CardHeader>
+                  <CardTitle>{tier.name}</CardTitle>
+                  <CardDescription className="text-2xl font-bold text-foreground">{tier.price}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {tier.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className="mt-4 w-full" variant={tier.name === "Pro" ? "default" : "outline"} data-testid={`button-upgrade-${tier.name.toLowerCase()}`}>
+                    {tier.name === "Free" ? "Current Plan" : "Upgrade"}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h2 className="mb-6 font-display text-3xl font-semibold flex items-center gap-2">
+          <Award className="h-8 w-8 text-primary" />
+          Your Achievements
+        </h2>
+        <Link href="/achievements">
+          <Button variant="outline" data-testid="button-view-achievements">
+            View All Achievements <Sparkles className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
+      </section>
     </div>
   );
 }

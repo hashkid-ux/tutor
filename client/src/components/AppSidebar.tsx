@@ -23,9 +23,12 @@ import {
   TrendingUp,
   User,
   BookMarked,
+  LogOut,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import LevelProgress from "./LevelProgress";
+import { useAuth } from "@/hooks/use-auth";
 
 const subjects = [
   { title: "Physics", icon: Atom, url: "/physics", color: "hsl(220, 90%, 60%)" },
@@ -47,6 +50,13 @@ const mainNav = [
 ];
 
 export default function AppSidebar() {
+  const { user, logout } = useAuth();
+
+  if (!user) return null;
+
+  const userInitials = user.username.substring(0, 2).toUpperCase();
+  const maxXpForLevel = (user.level + 1) * 1000;
+
   return (
     <Sidebar>
       <SidebarHeader className="border-b p-4">
@@ -55,15 +65,15 @@ export default function AppSidebar() {
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="font-display text-lg font-bold">EduQuest</h2>
-            <p className="text-xs text-muted-foreground">AI Learning RPG</p>
+            <h2 className="font-display text-lg font-bold">AI Tutor</h2>
+            <p className="text-xs text-muted-foreground">Class {user.selectedClass}</p>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Game</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => (
@@ -99,20 +109,31 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-4">
-        <div className="mb-4">
-          <LevelProgress level={12} xp={850} maxXp={1200} streak={7} />
+      <SidebarFooter className="border-t p-4 space-y-4">
+        <div>
+          <LevelProgress level={user.level} xp={user.xp} maxXp={maxXpForLevel} streak={0} />
         </div>
         <div className="flex items-center gap-3">
           <Avatar>
             <AvatarFallback className="bg-gradient-to-br from-primary to-chart-2 font-semibold text-white">
-              JD
+              {userInitials}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Scholar</p>
-            <p className="text-xs text-muted-foreground">Level 12 • Grade 12</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate">{user.username}</p>
+            <p className="text-xs text-muted-foreground">
+              Level {user.level} • {user.subscriptionTier}
+            </p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => logout()}
+            data-testid="button-logout"
+            title="Logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
